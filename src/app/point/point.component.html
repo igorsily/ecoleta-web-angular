@@ -1,0 +1,91 @@
+(
+<div id="page-create-point">
+  <header>
+    <img alt="Ecoleta" src="assets/logo.svg"/>
+    <a [routerLink]="['/']">
+      <mat-icon>keyboard_backspace</mat-icon>
+      Voltar para a home
+    </a>
+  </header>
+  <form [formGroup]="pointForm" (ngSubmit)="onSubmit()">
+    <h1>
+      Cadastro do <br/>
+      ponto de coleta
+    </h1>
+
+    <!--    <Dropzone onFileUploaded={setSelectedFile} />-->
+    <app-dropzone [onFileUpload]="onFileUpload"></app-dropzone>
+    <fieldset>
+      <legend>
+        <h2>Dados</h2>
+      </legend>
+
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Nome da entidade</mat-label>
+        <input matInput type="text"
+               formControlName="name">
+      </mat-form-field>
+
+
+      <div class="field-group">
+
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>E-mail</mat-label>
+          <input matInput type="email"
+                 formControlName="email">
+        </mat-form-field>
+
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Whatsapp</mat-label>
+          <input matInput type="text"
+                 formControlName="whatsapp">
+        </mat-form-field>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        <h2>Endereço</h2>
+        <span>Selecione o endereço no mapa</span>
+      </legend>
+
+      <app-map></app-map>
+
+      <div class="field-group">
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Estado(UF)</mat-label>
+          <mat-select formControlName="uf">
+            <mat-option value="0">Selecione uma UF</mat-option>
+            <mat-option *ngFor="let uf of ufs" [value]="uf.sigla">{{uf.sigla}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>Cidade</mat-label>
+          <mat-select formControlName="city">
+            <mat-option value="0">Selecione uma cidade</mat-option>
+            <mat-option *ngFor="let city of cities" [value]="city.nome">{{city.nome}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>
+        <h2>Ítens de coleta</h2>
+        <span>Selecione um ou mais ítens abaixo</span>
+      </legend>
+
+      <ul class="items-grid">
+        <li *ngFor="let item of items" [ngClass]="includesItem(item.id) ? 'selected' : ''" (click)="handleSelectItem(item.id)">
+          <img [src]="item.image" [alt]="item.title"/>
+          <span>{{item.title}}</span>
+        </li>
+
+      </ul>
+    </fieldset>
+
+    <button type="submit">Cadastrar ponto de coleta</button>
+  </form>
+</div>
+);

@@ -1,0 +1,7 @@
+<ngx-dropzone (change)="selectedFile($event)" class="dropzone">
+  <ngx-dropzone-label><mat-icon>upload_file</mat-icon> <p>Imagem do estabelecimento</p></ngx-dropzone-label>
+  <ngx-dropzone-image-preview ngProjectAs="ngx-dropzone-preview" *ngFor="let f of files" [file]="f" [removable]="true"
+                              (removed)="removeFile(f)">
+    <ngx-dropzone-label>{{ f.name }} ({{ f.type }})</ngx-dropzone-label>
+  </ngx-dropzone-image-preview>
+</ngx-dropzone>
