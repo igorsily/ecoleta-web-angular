@@ -1,7 +1,7 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {PointService} from './point.service';
 import {IBGEUFResponse} from './IBGEUFResponse';
-import {FormControl, FormGroup} from '@angular/forms';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {IBGECityResponse} from './IBGECityResponse';
 import {Item} from './Item';
 
@@ -12,12 +12,18 @@ import {Item} from './Item';
 })
 export class PointComponent implements OnInit, AfterViewInit {
 
+  @ViewChild('dropZone', {read: ElementRef, static: false}) dropZone: ElementRef;
+  @ViewChild('mapMarker', {read: ElementRef, static: false}) mapMarker: ElementRef;
+
+
   pointForm: FormGroup;
 
   ufs: Array<IBGEUFResponse>;
   cities: Array<IBGECityResponse>;
   selectedItems: Array<number> = [];
   selectedFile: File;
+  latitude: number;
+  longitude: number;
 
   items: Array<Item> = [
     {id: 1, title: 'Lâmpadas', image: 'assets/itens/lampadas.svg'},
@@ -28,17 +34,17 @@ export class PointComponent implements OnInit, AfterViewInit {
     {id: 6, title: 'Óleo de Cozinha', image: 'assets/itens/oleo.svg'},
   ];
 
-  constructor(private readonly  pointService: PointService) {
+  constructor(private readonly  pointService: PointService, private cd: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
 
     this.pointForm = new FormGroup({
-      name: new FormControl('0', []),
-      email: new FormControl('0', []),
-      whatsapp: new FormControl('0', []),
-      uf: new FormControl('0', []),
-      city: new FormControl('0', []),
+      name: new FormControl('', [Validators.required]),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      whatsapp: new FormControl('', [Validators.required]),
+      uf: new FormControl('0', [Validators.required]),
+      city: new FormControl('0', [Validators.required]),
     });
 
     this.pointService.getIBGEUfs().subscribe((ufs: Array<IBGEUFResponse>) => {
@@ -79,13 +85,43 @@ export class PointComponent implements OnInit, AfterViewInit {
   };
 
   onSubmit = (): void => {
-    const formData = new FormData();
+
+    if (!this.selectedFile) {
+      this.dropZone.nativeElement.focus();
+    }
+    // if (!this.latitude) {
+    //   this.mapMarker.nativeElement.focus();
+    // }
+
+    if (this.pointForm.invalid) {
+      return;
+    }
+
+
+    const formData: FormData = new FormData();
 
     for (const key of Object.keys(this.pointForm.controls)) {
-
       formData.append(key, this.pointForm.controls[key].value);
     }
 
+    formData.append('latitude', String(this.latitude));
+    formData.append('longitude', String(this.longitude));
+    formData.append('items', this.selectedItems.join(','));
+
+    if (this.selectedFile) {
+      formData.append('image', this.selectedFile);
+    }
+
+    this.pointService.savePoint(formData).subscribe((response) => console.log(response),
+      (error) => console.log(error));
+  };
+
+  handleLatitude = (latitude: number): void => {
+    this.latitude = latitude;
+  };
+
+  handleLongitude = (longitude: number): void => {
+    this.longitude = longitude;
   };
 
 }

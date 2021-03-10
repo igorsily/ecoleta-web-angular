@@ -1,4 +1,4 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Output} from '@angular/core';
 import * as L from 'leaflet';
 import {icon, Map as MapLeaflet, Marker} from 'leaflet';
 
@@ -30,6 +30,12 @@ export class MapComponent implements AfterViewInit {
 
   public map: MapLeaflet;
   marker;
+
+  @Output()
+  latitude = new EventEmitter<number>();
+
+  @Output()
+  longitude = new EventEmitter<number>();
 
   constructor() {
   }
@@ -73,7 +79,8 @@ export class MapComponent implements AfterViewInit {
     const {lat, lng} = e.latlng;
 
     this.marker = new L.Marker([lat, lng]).addTo(this.map);
-
+    this.latitude.emit(lat);
+    this.longitude.emit(lng);
   }
 
 
